@@ -20,6 +20,7 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.onosproject.mastership.MastershipStore;
 import org.onosproject.net.Device;
 import org.onosproject.net.Port;
 import org.onosproject.net.device.DeviceService;
@@ -33,6 +34,8 @@ import java.util.TimerTask;
 
 import org.onosproject.cpman.*;
 
+import static java.lang.String.valueOf;
+
 /**
  * Skeletal ONOS application component.
  */
@@ -43,7 +46,8 @@ public class AppComponent {
     @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
     protected DeviceService deviceService;
 
-    //terable<Device> devices = deviceService.getDevices();
+    @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
+    protected MastershipStore mastershipStore;
 
     Timer timer = new Timer();
 
@@ -51,21 +55,6 @@ public class AppComponent {
     @Activate
     protected void activate() {
         Iterable<Device> devices = deviceService.getDevices();
-        /*
-        for(Device d : devices){
-            List<Port> ports = deviceService.getPorts(d.id());
-            long bytes = 0;
-            for(Port port : ports){
-                PortStatistics portstat = deviceService.getStatisticsForPort(d.id(), port.number());
-                if(portstat != null) {
-                    bytes += portstat.bytesReceived();
-                }
-            }
-            log.info("Device ID: "+d.id().toString() + ", Received: " + bytes/1024 + " KB");
-        }
-
-         */
-
 
         TimerTask task = new TimerTask() {
             @Override
@@ -80,7 +69,8 @@ public class AppComponent {
                             bytes += portstat.bytesReceived();
                         }
                     }
-                    log.info("Device ID: "+d.id().toString() + ", Delta Received: " + bytes/1024 + " KB");
+                    //log.info("Device ID: "+d.id().toString() + ", Delta Received: " + bytes/1024 + " KB");
+                    log.info("# "+ d.id().toString() + ": " + mastershipStore.getMaster(d.id()));
                 }
             }
         };
