@@ -15,11 +15,14 @@
  */
 package org.test.clb;
 
+import org.apache.commons.collections.MultiMap;
+import org.apache.commons.collections.map.MultiValueMap;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Deactivate;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.onosproject.mastership.MastershipInfo;
 import org.onosproject.mastership.MastershipStore;
 import org.onosproject.net.Device;
 import org.onosproject.net.Port;
@@ -36,6 +39,8 @@ import org.onosproject.cpman.*;
 
 import static java.lang.String.valueOf;
 
+import org.onosproject.cluster.NodeId;
+
 /**
  * Skeletal ONOS application component.
  */
@@ -51,10 +56,10 @@ public class AppComponent {
 
     Timer timer = new Timer();
 
-
     @Activate
     protected void activate() {
         Iterable<Device> devices = deviceService.getDevices();
+        MultiMap multiMap = new MultiValueMap();
 
         TimerTask task = new TimerTask() {
             @Override
@@ -69,9 +74,13 @@ public class AppComponent {
                             bytes += portstat.bytesReceived();
                         }
                     }
+                    multiMap.put(mastershipStore.getMaster(d.id()),d.id().toString());
                     //log.info("Device ID: "+d.id().toString() + ", Delta Received: " + bytes/1024 + " KB");
-                    log.info("# "+ d.id().toString() + ": " + mastershipStore.getMaster(d.id()));
+                    //log.info("# "+ d.id().toString() + ": " + mastershipStore.getMaster(d.id()));
                 }
+                log.info("#172.17.0.5: " + multiMap.get("172.17.0.5"));
+                log.info("#172.17.0.6: " + multiMap.get("172.17.0.6"));
+                log.info("#172.17.0.7: " + multiMap.get("172.17.0.7"));
             }
         };
         timer.scheduleAtFixedRate(task, 0, 3000);

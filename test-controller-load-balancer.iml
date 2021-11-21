@@ -64,5 +64,6 @@
     <orderEntry type="library" name="Maven: org.onosproject:onos-app-cpman-api:1.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.onosproject:onos-core-serializers:1.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.onosproject:onos-incubator-api:1.6.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-collections4:4.4" level="project" />
   </component>
 </module>
