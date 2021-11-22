@@ -59,12 +59,14 @@ public class AppComponent {
     @Activate
     protected void activate() {
         Iterable<Device> devices = deviceService.getDevices();
-        MultiMap multiMap = new MultiValueMap();
 
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
                 log.info("*******************************");
+
+                MultiMap multiMap = new MultiValueMap();
+
                 for(Device d : devices){
                     List<Port> ports = deviceService.getPorts(d.id());
                     long bytes = 0;
@@ -74,7 +76,7 @@ public class AppComponent {
                             bytes += portstat.bytesReceived();
                         }
                     }
-                    multiMap.put(mastershipStore.getMaster(d.id()),d.id().toString());
+                    multiMap.put(mastershipStore.getMaster(d.id()).toString(),d.id().toString());
                     //log.info("Device ID: "+d.id().toString() + ", Delta Received: " + bytes/1024 + " KB");
                     //log.info("# "+ d.id().toString() + ": " + mastershipStore.getMaster(d.id()));
                 }
