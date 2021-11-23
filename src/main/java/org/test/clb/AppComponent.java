@@ -54,6 +54,11 @@ public class AppComponent {
     @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
     protected MastershipStore mastershipStore;
 
+    //Controller declaration
+    Controller A = new Controller("172.17.0.5");
+    Controller B = new Controller("172.17.0.6");
+    Controller C = new Controller("172.17.0.7");
+
     Timer timer = new Timer();
 
     @Activate
