@@ -4,6 +4,6 @@ public class Controller {
     String nodeIp;
     int load;
     Controller(String node){
-        nodeIp = node;
+        this.nodeIp = node;
     };
 }

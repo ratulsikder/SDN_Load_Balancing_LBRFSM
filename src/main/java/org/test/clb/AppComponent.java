@@ -31,6 +31,7 @@ import org.onosproject.net.device.PortStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -54,16 +55,17 @@ public class AppComponent {
     @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
     protected MastershipStore mastershipStore;
 
-    //Controller declaration
-    Controller A = new Controller("172.17.0.5");
-    Controller B = new Controller("172.17.0.6");
-    Controller C = new Controller("172.17.0.7");
-
     Timer timer = new Timer();
 
     @Activate
     protected void activate() {
         Iterable<Device> devices = deviceService.getDevices();
+
+        ArrayList<Controller> controllers = new ArrayList<Controller>();
+        //Controller Declaration
+        controllers.add(new Controller("172.17.0.5"));
+        controllers.add(new Controller("172.17.0.6"));
+        controllers.add(new Controller("172.17.0.7"));
 
         TimerTask task = new TimerTask() {
             @Override
@@ -85,9 +87,11 @@ public class AppComponent {
                     //log.info("Device ID: "+d.id().toString() + ", Delta Received: " + bytes/1024 + " KB");
                     //log.info("# "+ d.id().toString() + ": " + mastershipStore.getMaster(d.id()));
                 }
-                log.info("#172.17.0.5: " + multiMap.get("172.17.0.5"));
-                log.info("#172.17.0.6: " + multiMap.get("172.17.0.6"));
-                log.info("#172.17.0.7: " + multiMap.get("172.17.0.7"));
+
+                for(Controller controller: controllers)
+                {
+                    log.info("#" + controller.nodeIp + ": " + multiMap.get(controller.nodeIp));
+                }
             }
         };
         timer.scheduleAtFixedRate(task, 0, 3000);
