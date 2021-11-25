@@ -77,8 +77,7 @@ public class AppComponent {
                 log.info("*******************************");
 
                 //Initially set controllers load to zero
-                for(Controller controller: controllers)
-                {
+                for(Controller controller: controllers) {
                     controller.load = 0;
                 }
 
@@ -98,18 +97,15 @@ public class AppComponent {
                     //log.info("# "+ d.id().toString() + ": " + mastershipStore.getMaster(d.id()).toString());
 
                     //Getting controller load from devices
-                    for(Controller controller: controllers)
-                    {
+                    for(Controller controller: controllers) {
                         //log.info(String.valueOf(mastershipStore.getMaster(d.id())));
-                        if(controller.nodeId.equals(mastershipStore.getMaster(d.id())))
-                        {
+                        if(controller.nodeId.equals(mastershipStore.getMaster(d.id()))) {
                             controller.load += bytes;
                         }
                     }
                 }
 
-                for(Controller controller: controllers)
-                {
+                for(Controller controller: controllers) {
                     //log.info("#" + controller.nodeId + ": " + multiMap.get(controller.nodeId.toString()));
                     log.info("#"+controller.nodeId+" Load: "+controller.load);
                 }
