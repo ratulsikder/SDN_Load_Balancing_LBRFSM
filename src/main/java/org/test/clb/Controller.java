@@ -1,9 +1,11 @@
 package org.test.clb;
 
+import org.onosproject.cluster.NodeId;
+
 public class Controller {
-    String nodeIp;
-    int load;
-    Controller(String node){
-        this.nodeIp = node;
+    NodeId nodeId;
+    long load;
+    Controller(NodeId node){
+        this.nodeId = node;
     };
 }

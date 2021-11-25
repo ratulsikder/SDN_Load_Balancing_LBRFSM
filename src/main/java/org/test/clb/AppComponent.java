@@ -63,14 +63,24 @@ public class AppComponent {
 
         ArrayList<Controller> controllers = new ArrayList<Controller>();
         //Controller Declaration
-        controllers.add(new Controller("172.17.0.5"));
-        controllers.add(new Controller("172.17.0.6"));
-        controllers.add(new Controller("172.17.0.7"));
+        NodeId node1 = new NodeId("172.17.0.5");
+        NodeId node2 = new NodeId("172.17.0.6");
+        NodeId node3 = new NodeId("172.17.0.7");
+        //Assigning nodes to Array List
+        controllers.add(new Controller(node1));
+        controllers.add(new Controller(node2));
+        controllers.add(new Controller(node3));
 
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
                 log.info("*******************************");
+
+                //Initially set controllers load to zero
+                for(Controller controller: controllers)
+                {
+                    controller.load = 0;
+                }
 
                 MultiMap multiMap = new MultiValueMap();
 
@@ -85,12 +95,23 @@ public class AppComponent {
                     }
                     multiMap.put(mastershipStore.getMaster(d.id()).toString(),d.id().toString());
                     //log.info("Device ID: "+d.id().toString() + ", Delta Received: " + bytes/1024 + " KB");
-                    //log.info("# "+ d.id().toString() + ": " + mastershipStore.getMaster(d.id()));
+                    //log.info("# "+ d.id().toString() + ": " + mastershipStore.getMaster(d.id()).toString());
+
+                    //Getting controller load from devices
+                    for(Controller controller: controllers)
+                    {
+                        //log.info(String.valueOf(mastershipStore.getMaster(d.id())));
+                        if(controller.nodeId.equals(mastershipStore.getMaster(d.id())))
+                        {
+                            controller.load += bytes;
+                        }
+                    }
                 }
 
                 for(Controller controller: controllers)
                 {
-                    log.info("#" + controller.nodeIp + ": " + multiMap.get(controller.nodeIp));
+                    //log.info("#" + controller.nodeId + ": " + multiMap.get(controller.nodeId.toString()));
+                    log.info("#"+controller.nodeId+" Load: "+controller.load);
                 }
             }
         };
