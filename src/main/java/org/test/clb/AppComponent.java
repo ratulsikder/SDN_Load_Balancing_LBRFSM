@@ -31,10 +31,7 @@ import org.onosproject.net.device.PortStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import org.onosproject.cpman.*;
 
@@ -79,10 +76,10 @@ public class AppComponent {
                 //Initially set controllers load to zero
                 for(Controller controller: controllers) {
                     controller.load = 0;
+                    controller.switches.clear();
                 }
 
-                MultiMap multiMap = new MultiValueMap();
-
+                //Traversing each device for gathering port statistics
                 for(Device d : devices){
                     List<Port> ports = deviceService.getPorts(d.id());
                     long bytes = 0;
@@ -92,22 +89,28 @@ public class AppComponent {
                             bytes += portstat.bytesReceived();
                         }
                     }
-                    multiMap.put(mastershipStore.getMaster(d.id()).toString(),d.id().toString());
-                    //log.info("Device ID: "+d.id().toString() + ", Delta Received: " + bytes/1024 + " KB");
-                    //log.info("# "+ d.id().toString() + ": " + mastershipStore.getMaster(d.id()).toString());
 
-                    //Getting controller load from devices
+                    //Getting controller load from devices(switches) and add switches and aggregate controller lode to controller object
                     for(Controller controller: controllers) {
                         //log.info(String.valueOf(mastershipStore.getMaster(d.id())));
                         if(controller.nodeId.equals(mastershipStore.getMaster(d.id()))) {
                             controller.load += bytes;
+                            controller.addSwitch(d.id().toString());
                         }
                     }
                 }
 
+                //Retrieving info and display
                 for(Controller controller: controllers) {
-                    //log.info("#" + controller.nodeId + ": " + multiMap.get(controller.nodeId.toString()));
-                    log.info("#"+controller.nodeId+" Load: "+controller.load);
+                    ArrayList<Switch> switches = controller.getSwitches();
+                    int numberOfSwitch = switches.size();
+                    String switchIds[] = new String[numberOfSwitch];
+                    int i=0;
+                    for(Switch aSwitch:switches){
+                        switchIds[i] = aSwitch.id;
+                        i++;
+                    }
+                    log.info("#"+controller.nodeId+" Load: "+controller.load+" Switches: "+ Arrays.toString(switchIds));
                 }
             }
         };

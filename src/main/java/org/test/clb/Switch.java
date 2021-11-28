@@ -1,7 +1,7 @@
 package org.test.clb;
 
 public class Switch {
-    String id;
+    public String id;
     Switch(String id){
         this.id = id;
     }

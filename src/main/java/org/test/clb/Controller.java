@@ -11,4 +11,13 @@ public class Controller {
     Controller(NodeId node){
         this.nodeId = node;
     };
+
+    void addSwitch(String id) {
+        Switch aSwitch = new Switch(id);
+        this.switches.add(aSwitch);
+    }
+
+    ArrayList<Switch> getSwitches(){
+        return switches;
+    }
 }
