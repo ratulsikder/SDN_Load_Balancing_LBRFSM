@@ -75,7 +75,7 @@ public class AppComponent {
 
                 //Initially set controllers load to zero
                 for(Controller controller: controllers) {
-                    controller.load = 0;
+                    controller.controllerLoad = 0;
                     controller.switches.clear();
                 }
 
@@ -93,9 +93,9 @@ public class AppComponent {
                     //Getting controller load from devices(switches) and add switches and aggregate controller lode to controller object
                     for(Controller controller: controllers) {
                         //log.info(String.valueOf(mastershipStore.getMaster(d.id())));
-                        if(controller.nodeId.equals(mastershipStore.getMaster(d.id()))) {
-                            controller.load += bytes;
-                            controller.addSwitch(d.id().toString());
+                        if(controller.controllerId.equals(mastershipStore.getMaster(d.id()))) {
+                            controller.controllerLoad += bytes;
+                            controller.addSwitch(d.id().toString(),bytes);
                         }
                     }
                 }
@@ -104,13 +104,15 @@ public class AppComponent {
                 for(Controller controller: controllers) {
                     ArrayList<Switch> switches = controller.getSwitches();
                     int numberOfSwitch = switches.size();
-                    String switchIds[] = new String[numberOfSwitch];
+                    String switchId[] = new String[numberOfSwitch];
+                    long switchLoad[] = new long[numberOfSwitch];
                     int i=0;
                     for(Switch aSwitch:switches){
-                        switchIds[i] = aSwitch.id;
+                        switchId[i] = aSwitch.id;
+                        switchLoad[i] = aSwitch.switchLoad;
                         i++;
                     }
-                    log.info("#"+controller.nodeId+" Load: "+controller.load+" Switches: "+ Arrays.toString(switchIds));
+                    log.info("#"+controller.controllerId+" Load: "+controller.controllerLoad+" Switches: "+ Arrays.toString(switchId)+" Switch Load: "+ Arrays.toString(switchLoad));
                 }
             }
         };

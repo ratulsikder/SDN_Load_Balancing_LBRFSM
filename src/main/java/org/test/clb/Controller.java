@@ -5,15 +5,15 @@ import org.onosproject.cluster.NodeId;
 import java.util.ArrayList;
 
 public class Controller {
-    NodeId nodeId;
-    long load;
+    NodeId controllerId;
+    long controllerLoad;
     ArrayList<Switch> switches = new ArrayList<Switch>();
     Controller(NodeId node){
-        this.nodeId = node;
+        this.controllerId = node;
     };
 
-    void addSwitch(String id) {
-        Switch aSwitch = new Switch(id);
+    void addSwitch(String id, long load) {
+        Switch aSwitch = new Switch(id,load);
         this.switches.add(aSwitch);
     }
 
