@@ -1,10 +1,13 @@
 package org.test.clb;
 
+import org.onosproject.net.DeviceId;
+
 public class Switch {
-    String id;
+    DeviceId deviceId;
     long switchLoad;
-    Switch(String id, long switchLoad){
-        this.id = id;
+    Switch(DeviceId deviceId, long switchLoad){
+        //this.id = id;
+        this.deviceId = deviceId;
         this.switchLoad = switchLoad;
     }
 }

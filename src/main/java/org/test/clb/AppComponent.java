@@ -73,7 +73,7 @@ public class AppComponent {
             public void run() {
                 log.info("*******************************");
 
-                //Initially set controllers load to zero
+                //Initially set controllers load and switch list to zero
                 for(Controller controller: controllers) {
                     controller.controllerLoad = 0;
                     controller.switches.clear();
@@ -93,9 +93,9 @@ public class AppComponent {
                     //Getting controller load from devices(switches) and add switches and aggregate controller lode to controller object
                     for(Controller controller: controllers) {
                         //log.info(String.valueOf(mastershipStore.getMaster(d.id())));
-                        if(controller.controllerId.equals(mastershipStore.getMaster(d.id()))) {
+                        if(controller.nodeId.equals(mastershipStore.getMaster(d.id()))) {
                             controller.controllerLoad += bytes;
-                            controller.addSwitch(d.id().toString(),bytes);
+                            controller.addSwitch(d.id(),bytes);
                         }
                     }
                 }
@@ -108,11 +108,11 @@ public class AppComponent {
                     long switchLoad[] = new long[numberOfSwitch];
                     int i=0;
                     for(Switch aSwitch:switches){
-                        switchId[i] = aSwitch.id;
+                        switchId[i] = aSwitch.deviceId.toString();
                         switchLoad[i] = aSwitch.switchLoad;
                         i++;
                     }
-                    log.info("#"+controller.controllerId+" Load: "+controller.controllerLoad+" Switches: "+ Arrays.toString(switchId)+" Switch Load: "+ Arrays.toString(switchLoad));
+                    log.info("#"+controller.nodeId+" Load: "+controller.controllerLoad+" Switches: "+ Arrays.toString(switchId)+" Switch Load: "+ Arrays.toString(switchLoad));
                 }
             }
         };
