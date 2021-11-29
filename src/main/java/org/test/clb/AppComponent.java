@@ -114,9 +114,22 @@ public class AppComponent {
                     }
                     log.info("#"+controller.nodeId+" Load: "+controller.controllerLoad+" Switches: "+ Arrays.toString(switchId)+" Switch Load: "+ Arrays.toString(switchLoad));
                 }
+
+                //Testing switch reassignment
+                boolean test = true;
+                for(Controller controller: controllers){
+                    ArrayList<Switch> switches = controller.getSwitches();
+                    if((switches.size()>2) && (test) && (controller.nodeId!=node3)){
+                        mastershipStore.setMaster(node3,switches.get(0).deviceId);
+                        log.info("# Switch reassigned.");
+                        test = false;
+                    }
+                }
+
             }
         };
-        timer.scheduleAtFixedRate(task, 0, 3000);
+        //Timer delay 30 seconds; recommended 3 seconds
+        timer.scheduleAtFixedRate(task, 0, 30000);
 
 
     }

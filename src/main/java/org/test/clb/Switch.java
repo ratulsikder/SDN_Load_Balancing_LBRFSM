@@ -10,4 +10,7 @@ public class Switch {
         this.deviceId = deviceId;
         this.switchLoad = switchLoad;
     }
+    DeviceId getDeviceId(){
+        return  this.deviceId;
+    }
 }

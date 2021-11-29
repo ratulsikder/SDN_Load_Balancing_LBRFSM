@@ -6,7 +6,7 @@ import org.onosproject.net.DeviceId;
 import java.util.ArrayList;
 
 public class Controller {
-    NodeId nodeId;
+    public NodeId nodeId;
     long controllerLoad;
     ArrayList<Switch> switches = new ArrayList<Switch>();
     Controller(NodeId node){
