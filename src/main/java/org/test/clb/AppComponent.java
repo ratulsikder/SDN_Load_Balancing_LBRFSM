@@ -120,6 +120,7 @@ public class AppComponent {
                 for(Controller controller: controllers){
                     ArrayList<Switch> switches = controller.getSwitches();
                     if((switches.size()>2) && (test) && (controller.nodeId!=node3)){
+                        //run once per schedule
                         mastershipStore.setMaster(node3,switches.get(0).deviceId);
                         log.info("# Switch reassigned.");
                         test = false;

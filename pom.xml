@@ -18,8 +18,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.test.clb</groupId>
-    <artifactId>test-controller-load-balancer</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>controller-load-balancer</artifactId>
+    <version>1.0</version>
     <packaging>bundle</packaging>
 
     <description>ONOS OSGi bundle archetype</description>
@@ -28,9 +28,9 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <onos.version>1.15.0</onos.version>
-        <onos.app.name>org.foo.app</onos.app.name>
-        <onos.app.title>Foo App</onos.app.title>
-        <onos.app.origin>Foo, Inc.</onos.app.origin>
+        <onos.app.name>org.clb.app</onos.app.name>
+        <onos.app.title>CLB App</onos.app.title>
+        <onos.app.origin>CSE, BUET</onos.app.origin>
         <onos.app.category>default</onos.app.category>
         <onos.app.url>http://onosproject.org</onos.app.url>
         <onos.app.readme>ONOS OSGi bundle archetype.</onos.app.readme>

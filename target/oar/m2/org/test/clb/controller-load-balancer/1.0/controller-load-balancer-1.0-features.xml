@@ -14,10 +14,10 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<features xmlns="http://karaf.apache.org/xmlns/features/v1.2.0" name="test-controller-load-balancer-1.0-SNAPSHOT">
-    <feature name="test-controller-load-balancer" version="1.0-SNAPSHOT"
+<features xmlns="http://karaf.apache.org/xmlns/features/v1.2.0" name="controller-load-balancer-1.0">
+    <feature name="controller-load-balancer" version="1.0"
              description="ONOS OSGi bundle archetype.">
         <feature>onos-api</feature>
-        <bundle>mvn:org.test.clb/test-controller-load-balancer/1.0-SNAPSHOT</bundle>
+        <bundle>mvn:org.test.clb/controller-load-balancer/1.0</bundle>
     </feature>
 </features>
