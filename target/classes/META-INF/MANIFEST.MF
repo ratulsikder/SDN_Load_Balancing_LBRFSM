@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1647026422427
-Build-Jdk: 11.0.13
-Built-By: Ratul
+Bnd-LastModified: 1654630863946
+Build-Jdk: 18.0.1
+Built-By: ratul
 Bundle-Description: ONOS OSGi bundle archetype
 Bundle-ManifestVersion: 2
 Bundle-Name: controller-load-balancer
