@@ -99,16 +99,27 @@ public class AppComponent {
 
 				/*
 				 * Controller Overload Check
+				 * Detecting Overloaded Controller
 				 * Declaring Load Balancing(controller overload) Threshold
 				 * Future: Dynamic LB Threshold can be implemented
 				 */
 				final long loadBalancingThreshold = 15000;
+				Controller overloadedController = null;
 				//Sort Controller Arraylist wrt Controller Load(Reverse)
 				ArrayList<Controller> sortedControllers = controllers;
 				Collections.sort(sortedControllers, Comparator.comparing(Controller::getControllerLoad).reversed());
-				for(Controller controller: controllers){
-
+				for(Controller controller: sortedControllers){
+					if(controller.controllerLoad > loadBalancingThreshold){
+						overloadedController = controller;
+						break;
+					}
 				}
+				try{
+					log.info("Overloaded Controller: "+overloadedController.nodeId.toString());
+				}catch (NullPointerException exception){
+					log.info("No overloaded controllers.");
+				}
+
 
 
 				// For testing...
