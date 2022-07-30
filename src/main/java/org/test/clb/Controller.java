@@ -19,6 +19,9 @@ public class Controller {
     }
 
     ArrayList<Switch> getSwitches(){
-        return switches;
+        return this.switches;
+    }
+    long getControllerLoad(){
+        return this.controllerLoad;
     }
 }

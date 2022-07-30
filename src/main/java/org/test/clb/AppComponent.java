@@ -1,10 +1,6 @@
 package org.test.clb;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
@@ -101,14 +97,23 @@ public class AppComponent {
 				}
 				averageControllerLoad = (long)(temp/controllers.size());
 
-				//Controller Overload Check
-				//Declaring Load Balancing(controller overload) Threshold
+				/*
+				 * Controller Overload Check
+				 * Declaring Load Balancing(controller overload) Threshold
+				 * Future: Dynamic LB Threshold can be implemented
+				 */
 				final long loadBalancingThreshold = 15000;
+				//Sort Controller Arraylist wrt Controller Load(Reverse)
+				ArrayList<Controller> sortedControllers = controllers;
+				Collections.sort(sortedControllers, Comparator.comparing(Controller::getControllerLoad).reversed());
+				for(Controller controller: controllers){
+
+				}
 
 
 				// For testing...
 				// Retrieving info of each controller and display in ONOS log
-				for (Controller controller : controllers) {
+				for (Controller controller : sortedControllers) {
 					ArrayList<Switch> switches = controller.getSwitches();
 					int numberOfSwitch = switches.size();
 					String switchId[] = new String[numberOfSwitch];
