@@ -92,6 +92,20 @@ public class AppComponent {
 					}
 				}
 
+
+				//Calculating Average Controller Load
+				long averageControllerLoad;
+				long temp = 0;
+				for(Controller controller: controllers){
+					temp += controller.controllerLoad;
+				}
+				averageControllerLoad = (long)(temp/controllers.size());
+
+				//Controller Overload Check
+				//Declaring Load Balancing(controller overload) Threshold
+				final long loadBalancingThreshold = 15000;
+
+
 				// For testing...
 				// Retrieving info of each controller and display in ONOS log
 				for (Controller controller : controllers) {
@@ -109,7 +123,11 @@ public class AppComponent {
 							+ Arrays.toString(switchId) + " Switch Load: " + Arrays.toString(switchLoad));
 				}
 
-				// Testing switch reassignment
+				//Checking Controller Overload
+
+
+
+				// Testing switch reassignment...
 				boolean test = true;
 				for (Controller controller : controllers) {
 					ArrayList<Switch> switches = controller.getSwitches();
