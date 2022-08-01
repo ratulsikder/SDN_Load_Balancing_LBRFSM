@@ -114,10 +114,18 @@ public class AppComponent {
 						break;
 					}
 				}
+				//Print the overloaded controller
 				try{
 					log.info("Overloaded Controller: "+overloadedController.nodeId.toString());
 				}catch (NullPointerException exception){
 					log.info("No overloaded controllers.");
+				}
+
+				/*
+				Beginning Controller Selection Module
+				 */
+				if(overloadedController!=null){
+					
 				}
 
 
