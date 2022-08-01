@@ -114,19 +114,29 @@ public class AppComponent {
 						break;
 					}
 				}
-				//Print the overloaded controller
-				try{
-					log.info("Overloaded Controller: "+overloadedController.nodeId.toString());
-				}catch (NullPointerException exception){
-					log.info("No overloaded controllers.");
-				}
 
 				/*
 				Beginning Controller Selection Module
 				 */
+				Controller selectedController = null;
 				if(overloadedController!=null){
+					//Sort controller ascending order wrt load
+					Collections.sort(sortedControllers, Comparator.comparing(Controller::getControllerLoad));
+					/*
+					Getting the least loaded controller as selected controller for migration
+					Only load factor considered. Future add: Latency factor
+					 */
+					selectedController = sortedControllers.get(0);
 					
 				}
+
+				//Print the overloaded and selected controller
+				try{
+					log.info("Overloaded Controller: "+overloadedController.nodeId.toString()+ " Selected Controller: "+selectedController.nodeId.toString());
+				}catch (NullPointerException exception){
+					log.info("No overloaded controllers.");
+				}
+
 
 
 
@@ -152,6 +162,7 @@ public class AppComponent {
 
 
 				// Testing switch reassignment...
+				/*
 				boolean test = true;
 				for (Controller controller : controllers) {
 					ArrayList<Switch> switches = controller.getSwitches();
@@ -162,6 +173,8 @@ public class AppComponent {
 						test = false;
 					}
 				}
+
+				 */
 
 			}
 		};
