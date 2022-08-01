@@ -141,12 +141,22 @@ public class AppComponent {
 					selectedSwitch = overloadedController.switches.get(0);
 				}
 
+
 				//Print the overloaded and selected controller and selected switch
 				try{
 					log.info("Overloaded Controller: "+overloadedController.nodeId.toString()+ " Selected Controller: "+selectedController.nodeId.toString()+
 							" Selected Switch: "+selectedSwitch.getDeviceId().toString());
 				}catch (NullPointerException exception){
 					log.info("No overloaded controllers.");
+				}
+
+				/*
+				Starting Migration Module
+				Future: Migration failure will be tracked and avoided by controller selection and switch selection module
+				 */
+				if( (overloadedController!=null) && (selectedController!=null) && (selectedSwitch!=null) ){
+					mastershipStore.setMaster(selectedController.nodeId, selectedSwitch.deviceId);
+					log.info("Switch Reassigned: "+ selectedSwitch.deviceId.toString()+" -> "+selectedController.nodeId.toString());
 				}
 
 
