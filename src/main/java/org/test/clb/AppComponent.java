@@ -130,6 +130,11 @@ public class AppComponent {
 					
 				}
 
+				/*
+				Beginning Switch Selection Module
+				Select the most loaded switch from the overloaded controller
+				 */
+
 				//Print the overloaded and selected controller
 				try{
 					log.info("Overloaded Controller: "+overloadedController.nodeId.toString()+ " Selected Controller: "+selectedController.nodeId.toString());
