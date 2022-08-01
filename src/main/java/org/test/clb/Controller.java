@@ -24,4 +24,8 @@ public class Controller {
     long getControllerLoad(){
         return this.controllerLoad;
     }
+
+    String getNodeId(){
+        return this.nodeId.toString();
+    }
 }

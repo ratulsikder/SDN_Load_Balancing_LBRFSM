@@ -106,13 +106,10 @@ public class AppComponent {
 				final long loadBalancingThreshold = 15000;
 				Controller overloadedController = null;
 				//Sort Controller Arraylist wrt Controller Load(Reverse)
-				ArrayList<Controller> sortedControllers = controllers;
-				Collections.sort(sortedControllers, Comparator.comparing(Controller::getControllerLoad).reversed());
-				for(Controller controller: sortedControllers){
-					if(controller.controllerLoad > loadBalancingThreshold){
-						overloadedController = controller;
-						break;
-					}
+				//ArrayList<Controller> sortedControllers = controllers;
+				Collections.sort(controllers, Comparator.comparing(Controller::getControllerLoad).reversed());
+				if(controllers.get(0).controllerLoad > loadBalancingThreshold){
+					overloadedController = controllers.get(0);
 				}
 
 				/*
@@ -121,14 +118,17 @@ public class AppComponent {
 				Controller selectedController = null;
 				if(overloadedController!=null){
 					//Sort controller ascending order wrt load
-					Collections.sort(sortedControllers, Comparator.comparing(Controller::getControllerLoad));
+					Collections.sort(controllers, Comparator.comparing(Controller::getControllerLoad));
 					/*
 					Getting the least loaded controller as selected controller for migration
 					Only load factor considered. Future add: Latency factor
 					 */
-					selectedController = sortedControllers.get(0);
+					selectedController = controllers.get(0);
 					
 				}
+
+				//Re-sort controller objects wrt ip order(node address)
+				Collections.sort(controllers,Comparator.comparing(Controller::getNodeId));
 
 				/*
 				Beginning Switch Selection Module
@@ -151,20 +151,16 @@ public class AppComponent {
 				}
 
 				/*
-				Starting Migration Module
-				Future: Migration failure will be tracked and avoided by controller selection and switch selection module
-				 */
-				if( (overloadedController!=null) && (selectedController!=null) && (selectedSwitch!=null) ){
-					mastershipStore.setMaster(selectedController.nodeId, selectedSwitch.deviceId);
-					log.info("Switch Reassigned: "+ selectedSwitch.deviceId.toString()+" -> "+selectedController.nodeId.toString());
+				//Test print
+				for(Controller controller: controllers){
+					log.info("* " + controller.nodeId + " Load: " + controller.controllerLoad + " Switch: " + controller.switches.size());
 				}
 
-
-
+				 */
 
 				// For testing...
 				// Retrieving info of each controller and display in ONOS log
-				for (Controller controller : sortedControllers) {
+				for (Controller controller : controllers) {
 					ArrayList<Switch> switches = controller.getSwitches();
 					int numberOfSwitch = switches.size();
 					String switchId[] = new String[numberOfSwitch];
@@ -176,8 +172,55 @@ public class AppComponent {
 						i++;
 					}
 					log.info("* " + controller.nodeId + " Load: " + controller.controllerLoad + " Switches: "
-							+ Arrays.toString(switchId) + " Switch Load: " + Arrays.toString(switchLoad));
+							+ switches.size()+" -> "+ Arrays.toString(switchId) + " Switch Load: " + Arrays.toString(switchLoad));
 				}
+
+				/*
+				Starting Migration Module
+				Future: Migration failure will be tracked and avoided by controller selection and switch selection module
+				 */
+				if( (overloadedController!=null) && (selectedController!=null) && (selectedSwitch!=null) ){
+					//Reassigning switch
+					mastershipStore.setMaster(selectedController.nodeId, selectedSwitch.deviceId);
+					//Updating load info of controllers
+					overloadedController.controllerLoad -= selectedSwitch.switchLoad;
+					selectedController.controllerLoad += selectedSwitch.switchLoad;
+					//Removing the first element of the switch list. The first element is the switch selected and the list is sorted descending order.
+					overloadedController.switches.remove(0);
+					//Adding switch to the new controller(optional)
+					selectedController.switches.add(selectedSwitch);
+					log.info("Switch Reassigned: "+ selectedSwitch.deviceId.toString()+" -> "+selectedController.nodeId.toString());
+				}
+
+
+
+
+
+				// For testing...
+				// Retrieving info of each controller and display in ONOS log
+				for (Controller controller : controllers) {
+					ArrayList<Switch> switches = controller.getSwitches();
+					int numberOfSwitch = switches.size();
+					String switchId[] = new String[numberOfSwitch];
+					long switchLoad[] = new long[numberOfSwitch];
+					int i = 0;
+					for (Switch aSwitch : switches) {
+						switchId[i] = aSwitch.deviceId.toString();
+						switchLoad[i] = aSwitch.switchLoad;
+						i++;
+					}
+					log.info("# " + controller.nodeId + " Load: " + controller.controllerLoad + " Switches: "
+							+ switches.size()+" -> "+ Arrays.toString(switchId) + " Switch Load: " + Arrays.toString(switchLoad));
+				}
+
+
+				/*
+				for(Controller controller: controllers){
+					log.info("# " + controller.nodeId + " Load: " + controller.controllerLoad + " Switch: " + controller.switches.size());
+				}
+
+				 */
+
 
 				//Checking Controller Overload
 
