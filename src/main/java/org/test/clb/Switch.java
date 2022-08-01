@@ -13,4 +13,7 @@ public class Switch {
     DeviceId getDeviceId(){
         return  this.deviceId;
     }
+    long getSwitchLoad(){
+        return  this.switchLoad;
+    }
 }

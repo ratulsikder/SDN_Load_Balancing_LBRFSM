@@ -134,10 +134,17 @@ public class AppComponent {
 				Beginning Switch Selection Module
 				Select the most loaded switch from the overloaded controller
 				 */
+				Switch selectedSwitch = null;
+				if( (overloadedController!=null) && (selectedController!=null) ){
+					//Sort switch arraylist of overloaded controller object(descending)
+					Collections.sort(overloadedController.switches,Comparator.comparing(Switch::getSwitchLoad).reversed());
+					selectedSwitch = overloadedController.switches.get(0);
+				}
 
-				//Print the overloaded and selected controller
+				//Print the overloaded and selected controller and selected switch
 				try{
-					log.info("Overloaded Controller: "+overloadedController.nodeId.toString()+ " Selected Controller: "+selectedController.nodeId.toString());
+					log.info("Overloaded Controller: "+overloadedController.nodeId.toString()+ " Selected Controller: "+selectedController.nodeId.toString()+
+							" Selected Switch: "+selectedSwitch.getDeviceId().toString());
 				}catch (NullPointerException exception){
 					log.info("No overloaded controllers.");
 				}
