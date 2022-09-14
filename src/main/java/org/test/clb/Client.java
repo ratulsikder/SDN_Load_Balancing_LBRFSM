@@ -1,62 +1,49 @@
 package org.test.clb;// A Java program for a Client
+
 import java.net.*;
 import java.io.*;
 
-public class Client
-{
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class Client {
+    private final Logger log = LoggerFactory.getLogger(getClass());
     // initialize socket and input output streams
-    private Socket socket		 = null;
+    private Socket socket = null;
     private DataInputStream input = null;
-    private DataOutputStream out	 = null;
+    private DataOutputStream out = null;
 
     // constructor to put ip address and port
-    public Client(String address, int port)
-    {
+    public Client(String address, int port) {
         // establish a connection
-        try
-        {
+        try {
             socket = new Socket(address, port);
-            System.out.println("Connected");
-
-            // takes input from terminal
-            input = new DataInputStream(System.in);
-
             // sends output to the socket
             out = new DataOutputStream(socket.getOutputStream());
-        }
-        catch(UnknownHostException u)
-        {
-            System.out.println(u);
-        }
-        catch(IOException i)
-        {
-            System.out.println(i);
+        } catch (UnknownHostException u) {
+            log.info(u.toString());
+        } catch (IOException i) {
+            log.info(i.toString());
         }
     }
 
-    public void sendData(String data){
-        try
-        {
+    public void sendData(String data) {
+        try {
             out.writeUTF(data);
-        }
-        catch(IOException i)
-        {
-            System.out.println(i);
+        } catch (IOException i) {
+            log.info(i.toString());
         }
 
     }
 
-    public void connectionClose(){
+    public void connectionClose() {
         // close the connection
-        try
-        {
+        try {
             input.close();
             out.close();
             socket.close();
-        }
-        catch(IOException i)
-        {
-            System.out.println(i);
+        } catch (IOException i) {
+            log.info(i.toString());
         }
     }
 
