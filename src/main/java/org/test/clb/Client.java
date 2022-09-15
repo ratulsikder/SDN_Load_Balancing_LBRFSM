@@ -6,6 +6,8 @@ import java.io.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.constraints.Null;
+
 public class Client {
     private final Logger log = LoggerFactory.getLogger(getClass());
     // initialize socket and input output streams
@@ -32,6 +34,8 @@ public class Client {
             out.writeUTF(data);
         } catch (IOException i) {
             log.info(i.toString());
+        } catch (NullPointerException n){
+            log.info(n.toString());
         }
 
     }
