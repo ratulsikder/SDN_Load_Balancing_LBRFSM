@@ -51,11 +51,16 @@ public class AppComponent {
         // Getting all Switches(devices) of the Network
         Iterable<Device> devices = deviceService.getDevices();
 
+        //Counter
+        int counter = 0;
+
         // *******Starting Monitoring Module (within TimerTask)********
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
                 log.info("*** Starts Reporting ***");
+                // For exporting control plane data via java socket
+                String CSV;
 
                 // Initially set Controllers load and its Switches list to zero and blank
                 for (Controller controller : controllers) {
@@ -179,10 +184,14 @@ public class AppComponent {
                             + switches.size() + " -> " + Arrays.toString(switchId) + " Switch Load: " + Arrays.toString(switchLoad));
                 }
 
+                // CSV data add for sending
+                CSV = counter+","+
+
 				/*
 				Starting Migration Module
 				Future: Migration failure will be tracked and avoided by controller selection and switch selection module
 				 */
+                boolean switchMigration = false;
                 if ((overloadedController != null) && (selectedController != null) && (selectedSwitch != null)) {
                     //Reassigning switch
                     mastershipStore.setMaster(selectedController.nodeId, selectedSwitch.deviceId);
@@ -194,6 +203,7 @@ public class AppComponent {
                     //Adding switch to the new controller(optional)
                     selectedController.switches.add(selectedSwitch);
                     log.info("Switch Reassigned: " + selectedSwitch.deviceId.toString() + " -> " + selectedController.nodeId.toString());
+                    switchMigration = true;
                 }
 
 
