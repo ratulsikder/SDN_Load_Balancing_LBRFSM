@@ -27,6 +27,8 @@ public class AppComponent {
 
     // Timer to run Monitoring Module
     Timer timer = new Timer();
+    //Counter
+    int counter = 0;
 
     @Activate
     protected void activate() {
@@ -50,9 +52,6 @@ public class AppComponent {
 
         // Getting all Switches(devices) of the Network
         Iterable<Device> devices = deviceService.getDevices();
-
-        //Counter
-        int counter = 0;
 
         // *******Starting Monitoring Module (within TimerTask)********
         TimerTask task = new TimerTask() {
@@ -185,7 +184,10 @@ public class AppComponent {
                 }
 
                 // CSV data add for sending
-                CSV = counter+","+
+                CSV = counter+","+System.currentTimeMillis()+","+averageControllerLoad+",";
+                for(Controller controller : controllers){
+                    CSV+=controller.controllerLoad+",";
+                }
 
 				/*
 				Starting Migration Module
@@ -205,6 +207,11 @@ public class AppComponent {
                     log.info("Switch Reassigned: " + selectedSwitch.deviceId.toString() + " -> " + selectedController.nodeId.toString());
                     switchMigration = true;
                 }
+                // CSV data add for sending
+                CSV+=switchMigration+",";
+                for(Controller controller : controllers){
+                    CSV+=controller.controllerLoad+",";
+                }
 
 
                 // For testing...
@@ -222,8 +229,9 @@ public class AppComponent {
                     }
                     log.info("# " + controller.nodeId + " Load: " + controller.controllerLoad + " Switches: "
                             + switches.size() + " -> " + Arrays.toString(switchId) + " Switch Load: " + Arrays.toString(switchLoad));
-                    client.sendData("timer task data sent");
+                    client.sendData(CSV);
                 }
+                counter++;
 
 
 				/*
