@@ -212,6 +212,8 @@ public class AppComponent {
                 for(Controller controller : controllers){
                     CSV+=controller.controllerLoad+",";
                 }
+                //Trimming the last comma of CSV
+                CSV = CSV.substring(0,CSV.length()-1);
 
 
                 // For testing...
