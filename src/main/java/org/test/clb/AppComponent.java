@@ -27,11 +27,16 @@ public class AppComponent {
 
     // Timer to run Monitoring Module
     Timer timer = new Timer();
+
     //Counter
     int counter = 0;
+    //CSV Header
+    String CSVHeader = null;
 
     @Activate
     protected void activate() {
+        //App Start time
+        final long startTime = System.currentTimeMillis();
 
         //Java socket for sending data
         Client client = new Client("192.168.1.100", 5000);
@@ -123,6 +128,8 @@ public class AppComponent {
 				/*
 				Beginning Controller Selection Module
 				 */
+                long startControllerSelectionTime = System.nanoTime();
+
                 Controller selectedController = null;
                 if (overloadedController != null) {
                     //Sort controller ascending order wrt load
@@ -134,6 +141,8 @@ public class AppComponent {
                     selectedController = controllers.get(0);
 
                 }
+
+                long controllerSelectionTime = System.nanoTime()-startControllerSelectionTime;
 
                 //Re-sort controller objects wrt ip order(node address)
                 Collections.sort(controllers, Comparator.comparing(Controller::getNodeId));
@@ -184,10 +193,12 @@ public class AppComponent {
                 }
 
                 // CSV data add for sending
-                CSV = counter+","+System.currentTimeMillis()+","+averageControllerLoad+",";
+                CSV = counter+","+Math.subtractExact(System.currentTimeMillis(),startTime)+","+averageControllerLoad+",";
                 for(Controller controller : controllers){
                     CSV+=controller.controllerLoad+",";
                 }
+                //CSV Header
+                CSVHeader = "Iteration,Time(ms),Avg .Cont. Load,C1 Load,C2 Load,C3 Load,";
 
 				/*
 				Starting Migration Module
@@ -212,8 +223,16 @@ public class AppComponent {
                 for(Controller controller : controllers){
                     CSV+=controller.controllerLoad+",";
                 }
+                CSV+=controllerSelectionTime+",";
                 //Trimming the last comma of CSV
                 CSV = CSV.substring(0,CSV.length()-1);
+                //CSV Header
+                CSVHeader+="Sw. Migration,C1 Load after Sw. Mig.,C2 Load after Sw. Mig.,C3 Load after Sw. Mig.,Controller Selection Time(ns)";
+                //Send CSV Header once(first time only)
+                if(counter==0){
+                    client.sendData(CSVHeader);
+                }
+                client.sendData(CSV);
 
 
                 // For testing...
@@ -231,7 +250,6 @@ public class AppComponent {
                     }
                     log.info("# " + controller.nodeId + " Load: " + controller.controllerLoad + " Switches: "
                             + switches.size() + " -> " + Arrays.toString(switchId) + " Switch Load: " + Arrays.toString(switchLoad));
-                    client.sendData(CSV);
                 }
                 counter++;
 
