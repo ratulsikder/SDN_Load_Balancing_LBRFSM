@@ -293,8 +293,8 @@ public class AppComponent {
 
             }
         };
-        // Timer delay 10 seconds; recommended 3 seconds(from ONOS documentation)
-        timer.scheduleAtFixedRate(task, 0, 3000);
+        // Timer delay 1 second; recommended 3 seconds(from ONOS documentation)
+        timer.scheduleAtFixedRate(task, 0, 1000);
 
     }
 
