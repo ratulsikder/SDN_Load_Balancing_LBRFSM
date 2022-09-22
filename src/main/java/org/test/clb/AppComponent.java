@@ -30,6 +30,9 @@ public class AppComponent {
 
     //Counter
     int counter = 0;
+
+    //Number of switch migrations
+    int numberOfMigrations = 0;
     //CSV Header
     String CSVHeader = null;
 
@@ -57,6 +60,7 @@ public class AppComponent {
 
         // Getting all Switches(devices) of the Network
         Iterable<Device> devices = deviceService.getDevices();
+
 
         // *******Starting Monitoring Module (within TimerTask)********
         TimerTask task = new TimerTask() {
@@ -196,12 +200,12 @@ public class AppComponent {
                 }
 
                 // CSV data add for sending
-                CSV = counter + "," + Math.subtractExact(System.currentTimeMillis(), startTime) + "," + averageControllerLoad + ",";
+                CSV = counter + "," + Math.round(Math.subtractExact(System.currentTimeMillis(), startTime)/1000) + "," + averageControllerLoad + ",";
                 for (Controller controller : controllers) {
                     CSV += controller.controllerLoad + ",";
                 }
                 //CSV Header
-                CSVHeader = "Iteration,Time(ms),Avg .Cont. Load,C1 Load,C2 Load,C3 Load,";
+                CSVHeader = "Iteration,Time(s),Avg .Cont. Load,C1 Load,C2 Load,C3 Load,";
 
 				/*
 				Starting Migration Module
@@ -220,6 +224,7 @@ public class AppComponent {
                     selectedController.switches.add(selectedSwitch);
                     log.info("Switch Reassigned: " + selectedSwitch.deviceId.toString() + " -> " + selectedController.nodeId.toString());
                     switchMigration = true;
+                    numberOfMigrations ++;
                 }
                 // CSV data add for sending
                 CSV += switchMigration + ",";
@@ -228,11 +233,12 @@ public class AppComponent {
                 }
                 CSV += controllerSelectionTime + ",";
                 CSV += switchSelectionTime + ",";
+                CSV += numberOfMigrations + ",";
                 //Trimming the last comma of CSV
                 CSV = CSV.substring(0, CSV.length() - 1);
                 //CSV Header
                 CSVHeader += "Sw. Migration,C1 Load after Sw. Mig.,C2 Load after Sw. Mig.,C3 Load after Sw. Mig.,Controller Selection Time(ns)," +
-                        "Switch Selection Time(ns)";
+                        "Switch Selection Time(ns),Number of Migrations";
                 //Send CSV Header once(first time only)
                 if (counter == 0) {
                     client.sendData(CSVHeader);
@@ -288,7 +294,7 @@ public class AppComponent {
             }
         };
         // Timer delay 10 seconds; recommended 3 seconds(from ONOS documentation)
-        timer.scheduleAtFixedRate(task, 0, 10000);
+        timer.scheduleAtFixedRate(task, 0, 3000);
 
     }
 
