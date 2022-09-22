@@ -142,7 +142,7 @@ public class AppComponent {
 
                 }
 
-                long controllerSelectionTime = System.nanoTime()-startControllerSelectionTime;
+                long controllerSelectionTime = System.nanoTime() - startControllerSelectionTime;
 
                 //Re-sort controller objects wrt ip order(node address)
                 Collections.sort(controllers, Comparator.comparing(Controller::getNodeId));
@@ -151,12 +151,15 @@ public class AppComponent {
 				Beginning Switch Selection Module
 				Select the most loaded switch from the overloaded controller
 				 */
+                long startSwitchSelectionTime = System.nanoTime(); //Tracking switch selection time
                 Switch selectedSwitch = null;
                 if ((overloadedController != null) && (selectedController != null)) {
                     //Sort switch arraylist of overloaded controller object(descending)
                     Collections.sort(overloadedController.switches, Comparator.comparing(Switch::getSwitchLoad).reversed());
                     selectedSwitch = overloadedController.switches.get(0);
                 }
+
+                long switchSelectionTime = System.nanoTime() - startSwitchSelectionTime;
 
 
                 //Print the overloaded and selected controller and selected switch
@@ -193,9 +196,9 @@ public class AppComponent {
                 }
 
                 // CSV data add for sending
-                CSV = counter+","+Math.subtractExact(System.currentTimeMillis(),startTime)+","+averageControllerLoad+",";
-                for(Controller controller : controllers){
-                    CSV+=controller.controllerLoad+",";
+                CSV = counter + "," + Math.subtractExact(System.currentTimeMillis(), startTime) + "," + averageControllerLoad + ",";
+                for (Controller controller : controllers) {
+                    CSV += controller.controllerLoad + ",";
                 }
                 //CSV Header
                 CSVHeader = "Iteration,Time(ms),Avg .Cont. Load,C1 Load,C2 Load,C3 Load,";
@@ -219,23 +222,25 @@ public class AppComponent {
                     switchMigration = true;
                 }
                 // CSV data add for sending
-                CSV+=switchMigration+",";
-                for(Controller controller : controllers){
-                    CSV+=controller.controllerLoad+",";
+                CSV += switchMigration + ",";
+                for (Controller controller : controllers) {
+                    CSV += controller.controllerLoad + ",";
                 }
-                CSV+=controllerSelectionTime+",";
+                CSV += controllerSelectionTime + ",";
+                CSV += switchSelectionTime + ",";
                 //Trimming the last comma of CSV
-                CSV = CSV.substring(0,CSV.length()-1);
+                CSV = CSV.substring(0, CSV.length() - 1);
                 //CSV Header
-                CSVHeader+="Sw. Migration,C1 Load after Sw. Mig.,C2 Load after Sw. Mig.,C3 Load after Sw. Mig.,Controller Selection Time(ns)";
+                CSVHeader += "Sw. Migration,C1 Load after Sw. Mig.,C2 Load after Sw. Mig.,C3 Load after Sw. Mig.,Controller Selection Time(ns)," +
+                        "Switch Selection Time(ns)";
                 //Send CSV Header once(first time only)
-                if(counter==0){
+                if (counter == 0) {
                     client.sendData(CSVHeader);
                 }
                 client.sendData(CSV);
 
 
-                // For testing...
+                // For testing...(After Sw. Migration)
                 // Retrieving info of each controller and display in ONOS log
                 for (Controller controller : controllers) {
                     ArrayList<Switch> switches = controller.getSwitches();
