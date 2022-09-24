@@ -118,9 +118,17 @@ public class AppComponent {
                  * Controller Overload Check
                  * Detecting Overloaded Controller
                  * Declaring Load Balancing(controller overload) Threshold
-                 * Future: Dynamic LB Threshold can be implemented
+                 * Dynamic LB Threshold
+                 * On heavy load, the threshold will be 1.2 the avg. load
                  */
-                final long loadBalancingThreshold = 15000;
+                final long threshold = 16000;
+                long loadBalancingThreshold;
+                if(averageControllerLoad < threshold){
+                    loadBalancingThreshold = threshold;
+                }else{
+                    loadBalancingThreshold = (long)Math.round(averageControllerLoad*1.20);;
+                }
+
                 Controller overloadedController = null;
                 //Sort Controller Arraylist wrt Controller Load(Reverse)
                 //ArrayList<Controller> sortedControllers = controllers;
@@ -227,18 +235,23 @@ public class AppComponent {
                     numberOfMigrations ++;
                 }
                 // CSV data add for sending
-                CSV += switchMigration + ",";
+                if(switchMigration){
+                    CSV += "1,";
+                }else{
+                    CSV += "0,";
+                }
                 for (Controller controller : controllers) {
                     CSV += controller.controllerLoad + ",";
                 }
                 CSV += controllerSelectionTime + ",";
                 CSV += switchSelectionTime + ",";
                 CSV += numberOfMigrations + ",";
+                CSV += loadBalancingThreshold + ",";
                 //Trimming the last comma of CSV
                 CSV = CSV.substring(0, CSV.length() - 1);
                 //CSV Header
                 CSVHeader += "Sw. Migration,C1 Load after Sw. Mig.,C2 Load after Sw. Mig.,C3 Load after Sw. Mig.,Controller Selection Time(ns)," +
-                        "Switch Selection Time(ns),Number of Migrations";
+                        "Switch Selection Time(ns),Number of Migrations,Load Balancing Threshold";
                 //Send CSV Header once(first time only)
                 if (counter == 0) {
                     client.sendData(CSVHeader);
@@ -293,8 +306,8 @@ public class AppComponent {
 
             }
         };
-        // Timer delay 1 second; recommended 3 seconds(from ONOS documentation)
-        timer.scheduleAtFixedRate(task, 0, 1000);
+        // Timer delay 3 second; recommended 3 seconds(from ONOS documentation)
+        timer.scheduleAtFixedRate(task, 0, 3000);
 
     }
 
