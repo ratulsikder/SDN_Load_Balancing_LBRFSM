@@ -11,3 +11,9 @@ target/oar/m2/org/test/clb/controller-load-balancer/1.0/controller-load-balancer
 target/oar/m2/org/test/clb/controller-load-balancer/1.0/controller-load-balancer-1.0.jar
 target/surefire-reports/org.test.clb.AppComponentTest.txt
 target/surefire-reports/TEST-org.test.clb.AppComponentTest.xml
+target/classes/META-INF/MANIFEST.MF
+target/controller-load-balancer-1.0.jar
+target/controller-load-balancer-1.0.oar
+target/oar/m2/org/test/clb/controller-load-balancer/1.0/controller-load-balancer-1.0.jar
+target/surefire-reports/org.test.clb.AppComponentTest.txt
+target/surefire-reports/TEST-org.test.clb.AppComponentTest.xml
