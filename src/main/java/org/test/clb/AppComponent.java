@@ -119,27 +119,40 @@ public class AppComponent {
                  * Detecting Overloaded Controller
                  * Declaring Load Balancing(controller overload) Threshold
                  * Dynamic LB Threshold
-                 * On heavy load, the threshold will be 1.2 the avg. load
+                 * On heavy load, the threshold will be 1.2 the avg. load //1.1 for testing
                  */
                 final long threshold = 16000;
                 long loadBalancingThreshold;
+                /*
+                If average controller load is higher than threshold(under heavy load situation)
+                the load balancing threshold will increase and dynamicLoadBalancingThreshold will be true.
+                When FALSE the regular controller selection(lower loaded controller) will take place
+                Otherwise controller below x% (x<100) of average load will be selected to stop excessive and unnecessary Sw.Mig.
+                 */
+                boolean dynamicLoadBalancingThreshold = false;
                 if(averageControllerLoad < threshold){
                     loadBalancingThreshold = threshold;
                 }else{
-                    loadBalancingThreshold = (long)Math.round(averageControllerLoad*1.20);;
+                    loadBalancingThreshold = (long)Math.round(averageControllerLoad*1.10);
+                    dynamicLoadBalancingThreshold = true;
                 }
 
+                //************ Overloaded controller detection *************
                 Controller overloadedController = null;
+                //For storing the previous load value(before mig.) for sending to CSV as Switch Migration value to plot graph to identify switch migration point
+                long overloadedControllerLoad=0;
                 //Sort Controller Arraylist wrt Controller Load(Reverse)
                 //ArrayList<Controller> sortedControllers = controllers;
                 Collections.sort(controllers, Comparator.comparing(Controller::getControllerLoad).reversed());
                 if (controllers.get(0).controllerLoad > loadBalancingThreshold) {
                     overloadedController = controllers.get(0);
+                    overloadedControllerLoad = overloadedController.controllerLoad;
                 }
 
 				/*
-				Beginning Controller Selection Module
+				************* Beginning Controller Selection Module **************
 				 */
+                //For tracking Controller Selection Time
                 long startControllerSelectionTime = System.nanoTime();
 
                 Controller selectedController = null;
@@ -150,11 +163,17 @@ public class AppComponent {
 					Getting the least loaded controller as selected controller for migration
 					Only load factor considered. Future add: Latency factor
 					 */
-                    /* If the min. loaded controller don't have significantly lower load (below 80% of avg. load)
-                    then no migrations to reduce unnecessary load balancing
+                    /* If the min. loaded controller don't have significantly lower load (below 90% of avg. load)
+                    then no migrations to reduce unnecessary load balancing (for dynamic LB threshold only)
                      */
-                    if(controllers.get(0).controllerLoad < (long)Math.round(averageControllerLoad*0.80)){
+
+                    if(dynamicLoadBalancingThreshold){
+                        if(controllers.get(0).controllerLoad < (long)Math.round(averageControllerLoad*0.80)){
+                            selectedController = controllers.get(0);
+                        }
+                    }else{
                         selectedController = controllers.get(0);
+                        //It's possible to set two threshold for dynamic and static LB threshold (using else-if for this block)
                     }
 
                 }
@@ -224,6 +243,17 @@ public class AppComponent {
 				Starting Migration Module
 				Future: Migration failure will be tracked and avoided by controller selection and switch selection module
 				 */
+                //For storing the previous load value(before mig.) for sending to CSV as Switch Migration value to plot graph to identify switch migration point
+                /*long selectedControllerLoad=0;
+                try{
+                    selectedControllerLoad = selectedController.controllerLoad;
+                }catch (NullPointerException nullPointerException){
+                    log.info(nullPointerException.toString());
+                }
+
+                 */
+
+
                 boolean switchMigration = false;
                 if ((overloadedController != null) && (selectedController != null) && (selectedSwitch != null)) {
                     //Reassigning switch
@@ -241,7 +271,7 @@ public class AppComponent {
                 }
                 // CSV data add for sending
                 if(switchMigration){
-                    CSV += "1,";
+                    CSV += overloadedControllerLoad + ",";
                 }else{
                     CSV += "0,";
                 }
