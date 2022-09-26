@@ -29,7 +29,7 @@ public class AppComponent {
     Timer timer = new Timer();
 
     //Counter
-    int counter = 0;
+    int iteration = 0;
 
     //Number of switch migrations
     int numberOfMigrations = 0;
@@ -208,12 +208,12 @@ public class AppComponent {
                 }
 
                 // CSV data add for sending
-                CSV = counter + "," + Math.round(Math.subtractExact(System.currentTimeMillis(), startTime)/1000) + "," + averageControllerLoad + ",";
+                CSV = Math.round(Math.subtractExact(System.currentTimeMillis(), startTime)/1000) + "," + iteration +","+ averageControllerLoad + ",";
                 for (Controller controller : controllers) {
                     CSV += controller.controllerLoad + ",";
                 }
                 //CSV Header
-                CSVHeader = "Iteration,Time(s),Avg .Cont. Load,C1 Load,C2 Load,C3 Load,";
+                CSVHeader = "Time(s),Iteration,Avg .Cont. Load,C1 Load,C2 Load,C3 Load,";
 
 				/*
 				Starting Migration Module
@@ -253,7 +253,7 @@ public class AppComponent {
                 CSVHeader += "Sw. Migration,C1 Load after Sw. Mig.,C2 Load after Sw. Mig.,C3 Load after Sw. Mig.,Controller Selection Time(ns)," +
                         "Switch Selection Time(ns),Number of Migrations,Load Balancing Threshold";
                 //Send CSV Header once(first time only)
-                if (counter == 0) {
+                if (iteration == 0) {
                     client.sendData(CSVHeader);
                 }
                 client.sendData(CSV);
@@ -275,7 +275,7 @@ public class AppComponent {
                     log.info("# " + controller.nodeId + " Load: " + controller.controllerLoad + " Switches: "
                             + switches.size() + " -> " + Arrays.toString(switchId) + " Switch Load: " + Arrays.toString(switchLoad));
                 }
-                counter++;
+                iteration++;
 
 
 				/*
