@@ -150,7 +150,12 @@ public class AppComponent {
 					Getting the least loaded controller as selected controller for migration
 					Only load factor considered. Future add: Latency factor
 					 */
-                    selectedController = controllers.get(0);
+                    /* If the min. loaded controller don't have significantly lower load (below 80% of avg. load)
+                    then no migrations to reduce unnecessary load balancing
+                     */
+                    if(controllers.get(0).controllerLoad < (long)Math.round(averageControllerLoad*0.80)){
+                        selectedController = controllers.get(0);
+                    }
 
                 }
 
