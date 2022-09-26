@@ -213,7 +213,7 @@ public class AppComponent {
                     CSV += controller.controllerLoad + ",";
                 }
                 //CSV Header
-                CSVHeader = "Time(s),Iteration,Avg .Cont. Load,C1 Load,C2 Load,C3 Load,";
+                CSVHeader = "Time(s),Iteration,Avg .Cont. Load,Controller 1 Load,Controller 2 Load,Controller 3 Load,";
 
 				/*
 				Starting Migration Module
@@ -250,7 +250,7 @@ public class AppComponent {
                 //Trimming the last comma of CSV
                 CSV = CSV.substring(0, CSV.length() - 1);
                 //CSV Header
-                CSVHeader += "Sw. Migration,C1 Load after Sw. Mig.,C2 Load after Sw. Mig.,C3 Load after Sw. Mig.,Controller Selection Time(ns)," +
+                CSVHeader += "Sw. Migration,Controller 1 Load after Sw. Mig.,Controller 2 Load after Sw. Mig.,Controller 3 Load after Sw. Mig.,Controller Selection Time(ns)," +
                         "Switch Selection Time(ns),Number of Migrations,Load Balancing Threshold";
                 //Send CSV Header once(first time only)
                 if (iteration == 0) {
