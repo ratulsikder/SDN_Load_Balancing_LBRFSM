@@ -6,11 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="test-controller-load-balancer" />
+        <module name="controller-load-balancer" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="test-controller-load-balancer" target="1.8" />
+      <module name="controller-load-balancer" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

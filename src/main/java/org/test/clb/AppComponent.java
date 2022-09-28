@@ -133,7 +133,7 @@ public class AppComponent {
                 if(averageControllerLoad < threshold){
                     loadBalancingThreshold = threshold;
                 }else{
-                    loadBalancingThreshold = (long)Math.round(averageControllerLoad*1.10);
+                    loadBalancingThreshold = (long)Math.round(averageControllerLoad*1.25);
                     dynamicLoadBalancingThreshold = true;
                 }
 
@@ -168,7 +168,7 @@ public class AppComponent {
                      */
 
                     if(dynamicLoadBalancingThreshold){
-                        if(controllers.get(0).controllerLoad < (long)Math.round(averageControllerLoad*0.80)){
+                        if(controllers.get(0).controllerLoad < (long)Math.round(averageControllerLoad*0.75)){
                             selectedController = controllers.get(0);
                         }
                     }else{
@@ -273,7 +273,7 @@ public class AppComponent {
                 if(switchMigration){
                     CSV += overloadedControllerLoad + ",";
                 }else{
-                    CSV += "0,";
+                    CSV += "-9999,";
                 }
                 for (Controller controller : controllers) {
                     CSV += controller.controllerLoad + ",";

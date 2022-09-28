@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/test-controller-load-balancer.iml" filepath="$PROJECT_DIR$/test-controller-load-balancer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/controller-load-balancer.iml" filepath="$PROJECT_DIR$/controller-load-balancer.iml" />
     </modules>
   </component>
 </project>
