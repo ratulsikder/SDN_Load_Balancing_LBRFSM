@@ -133,7 +133,7 @@ public class AppComponent {
                 if(averageControllerLoad < threshold){
                     loadBalancingThreshold = threshold;
                 }else{
-                    loadBalancingThreshold = (long)Math.round(averageControllerLoad*1.25);
+                    loadBalancingThreshold = (long)Math.round(averageControllerLoad*1.20);
                     dynamicLoadBalancingThreshold = true;
                 }
 
@@ -168,7 +168,7 @@ public class AppComponent {
                      */
 
                     if(dynamicLoadBalancingThreshold){
-                        if(controllers.get(0).controllerLoad < (long)Math.round(averageControllerLoad*0.75)){
+                        if(controllers.get(0).controllerLoad < (long)Math.round(averageControllerLoad*0.80)){
                             selectedController = controllers.get(0);
                         }
                     }else{
@@ -184,15 +184,26 @@ public class AppComponent {
                 Collections.sort(controllers, Comparator.comparing(Controller::getNodeId));
 
 				/*
-				Beginning Switch Selection Module
-				Select the most loaded switch from the overloaded controller
+				************************* Beginning Switch Selection Module **********************
+				
+				Select the suitable switch(possible higher loaded) to make the selected controller's load closer(and less than) to LB threshold.
+				* Future: Optimize to avg. ctl load
 				 */
                 long startSwitchSelectionTime = System.nanoTime(); //Tracking switch selection time
                 Switch selectedSwitch = null;
                 if ((overloadedController != null) && (selectedController != null)) {
                     //Sort switch arraylist of overloaded controller object(descending)
-                    Collections.sort(overloadedController.switches, Comparator.comparing(Switch::getSwitchLoad).reversed());
-                    selectedSwitch = overloadedController.switches.get(0);
+                    //Collections.sort(overloadedController.switches, Comparator.comparing(Switch::getSwitchLoad).reversed());
+                    for (Switch sw: overloadedController.switches) {
+                        sw.temp = loadBalancingThreshold - (selectedController.controllerLoad + sw.switchLoad);
+                    }
+                    Collections.sort(overloadedController.switches, Comparator.comparing(Switch::getSwitchTemp));
+                    for(Switch sw: overloadedController.switches){
+                        if(sw.temp > 0){
+                            selectedSwitch = sw;
+                            break;
+                        }
+                    }
                 }
 
                 long switchSelectionTime = System.nanoTime() - startSwitchSelectionTime;

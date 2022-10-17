@@ -5,6 +5,9 @@ import org.onosproject.net.DeviceId;
 public class Switch {
     DeviceId deviceId;
     long switchLoad;
+
+    //Temp for storing temporary switch selection data
+    long temp;
     Switch(DeviceId deviceId, long switchLoad){
         //this.id = id;
         this.deviceId = deviceId;
@@ -15,5 +18,9 @@ public class Switch {
     }
     long getSwitchLoad(){
         return  this.switchLoad;
+    }
+
+    long getSwitchTemp(){
+        return this.temp;
     }
 }
