@@ -17,3 +17,15 @@ target/controller-load-balancer-1.0.oar
 target/oar/m2/org/test/clb/controller-load-balancer/1.0/controller-load-balancer-1.0.jar
 target/surefire-reports/org.test.clb.AppComponentTest.txt
 target/surefire-reports/TEST-org.test.clb.AppComponentTest.xml
+.idea/encodings.xml
+.idea/encodings.xml
+.idea/misc.xml
+.idea/runConfigurations.xml
+target/classes/META-INF/MANIFEST.MF
+target/controller-load-balancer-1.0.jar
+target/controller-load-balancer-1.0.oar
+target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
+target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst
+target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst
+target/oar/app.xml
