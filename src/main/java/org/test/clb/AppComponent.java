@@ -166,7 +166,7 @@ public class AppComponent {
                     /* If the min. loaded controller don't have significantly lower load (below 90% of avg. load)
                     then no migrations to reduce unnecessary load balancing (for dynamic LB threshold only)
                      */
-
+                    //For avoiding excessive and unnecessary sw. mig.
                     if(dynamicLoadBalancingThreshold){
                         if(controllers.get(0).controllerLoad < (long)Math.round(averageControllerLoad*0.80)){
                             selectedController = controllers.get(0);
@@ -195,7 +195,7 @@ public class AppComponent {
                     //Sort switch arraylist of overloaded controller object(descending)
                     //Collections.sort(overloadedController.switches, Comparator.comparing(Switch::getSwitchLoad).reversed());
                     for (Switch sw: overloadedController.switches) {
-                        sw.temp = loadBalancingThreshold - (selectedController.controllerLoad + sw.switchLoad);
+                        sw.temp = averageControllerLoad - (selectedController.controllerLoad + sw.switchLoad);
                     }
                     Collections.sort(overloadedController.switches, Comparator.comparing(Switch::getSwitchTemp));
                     for(Switch sw: overloadedController.switches){
