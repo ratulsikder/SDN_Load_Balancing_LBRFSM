@@ -8,7 +8,9 @@ import java.util.ArrayList;
 public class Controller {
     public NodeId nodeId;
     long controllerLoad = 0;
-    ArrayList<Switch> switches = new ArrayList<Switch>();
+
+    ArrayList<DeviceId> homeSwitches = new ArrayList<>();
+    ArrayList<Switch> switches = new ArrayList<>();
     Controller(NodeId node){
         this.nodeId = node;
     };

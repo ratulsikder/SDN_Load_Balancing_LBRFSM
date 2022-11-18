@@ -66,9 +66,6 @@ public class AppComponent {
         controllers.add(new Controller(node2));
         controllers.add(new Controller(node3));
 
-        // Getting all Switches(devices) of the Network
-        Iterable<Device> devices = deviceService.getDevices();
-
         // Initial Switch-Controller Assignment Data
         ArrayList<DeviceId> node1Devices = new ArrayList<>();
         ArrayList<DeviceId> node2Devices = new ArrayList<>();
@@ -105,26 +102,33 @@ public class AppComponent {
             controllers.get(0).addSwitch(deviceId, 0);
             try {
                 mastershipStore.setMaster(node1, deviceId);
-            }catch (NullPointerException nullPointerException){
-                log.info("At switch assignment -> "+nullPointerException);
+            } catch (NullPointerException nullPointerException) {
+                log.info("At switch assignment -> " + nullPointerException);
             }
         }
         for (DeviceId deviceId : node2Devices) {
             controllers.get(1).addSwitch(deviceId, 0);
             try {
                 mastershipStore.setMaster(node2, deviceId);
-            }catch (NullPointerException nullPointerException){
-                log.info("At switch assignment -> "+nullPointerException);
+            } catch (NullPointerException nullPointerException) {
+                log.info("At switch assignment -> " + nullPointerException);
             }
         }
         for (DeviceId deviceId : node3Devices) {
             controllers.get(2).addSwitch(deviceId, 0);
             try {
                 mastershipStore.setMaster(node3, deviceId);
-            }catch (NullPointerException nullPointerException){
-                log.info("At switch assignment -> "+nullPointerException);
+            } catch (NullPointerException nullPointerException) {
+                log.info("At switch assignment -> " + nullPointerException);
             }
         }
+        // Assigning home switches to controller object
+        controllers.get(0).homeSwitches = node1Devices;
+        controllers.get(1).homeSwitches = node2Devices;
+        controllers.get(2).homeSwitches = node3Devices;
+
+        // Getting all Switches(devices) of the Network
+        Iterable<Device> devices = deviceService.getDevices();
 
 
         // *******Starting Monitoring Module (within TimerTask)********
@@ -417,7 +421,34 @@ public class AppComponent {
 
 				 */
 
+                // ******************** Restoration Module *********************
+                if (switchMigration == false) {
+                    // Sorting controllers from min load to max
+                    Collections.sort(controllers, Comparator.comparing(Controller::getControllerLoad));
+                    ArrayList<Switch> allSwitches = new ArrayList<>();
+                    for (Controller controller : controllers) {
+                        allSwitches.addAll(controller.switches);
+                    }
+
+                    for (Controller controller : controllers) {
+                        if (controller.controllerLoad < averageControllerLoad) {
+                            ArrayList<Switch> homeSwitches = new ArrayList<>();
+                            for (DeviceId deviceId : controller.homeSwitches) {
+                                for (Switch aSwitch : allSwitches) {
+                                    if(deviceId == aSwitch.deviceId){
+                                        homeSwitches.add(aSwitch);
+                                    }
+                                }
+                            }
+                            
+                        }
+                    }
+
+                }
+
             }
+
+
         };
         // Timer delay 3 second; recommended 3 seconds(from ONOS documentation)
         timer.scheduleAtFixedRate(task, 0, 3000);

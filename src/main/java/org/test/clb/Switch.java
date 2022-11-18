@@ -7,7 +7,7 @@ public class Switch {
     DeviceId deviceId;
     long switchLoad;
 
-    NodeId homeController, assignedController;
+    //NodeId homeController, assignedController;
 
     //Temp for storing temporary switch selection data
     long temp;
