@@ -1,10 +1,13 @@
 package org.test.clb;
 
+import org.onosproject.cluster.NodeId;
 import org.onosproject.net.DeviceId;
 
 public class Switch {
     DeviceId deviceId;
     long switchLoad;
+
+    NodeId homeController, assignedController;
 
     //Temp for storing temporary switch selection data
     long temp;

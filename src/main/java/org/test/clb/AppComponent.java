@@ -1,5 +1,9 @@
 package org.test.clb;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.util.*;
 
 import org.apache.felix.scr.annotations.Activate;
@@ -10,11 +14,14 @@ import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.onosproject.cluster.NodeId;
 import org.onosproject.mastership.MastershipStore;
 import org.onosproject.net.Device;
+import org.onosproject.net.DeviceId;
 import org.onosproject.net.Port;
 import org.onosproject.net.device.DeviceService;
 import org.onosproject.net.device.PortStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.onosproject.cluster.NodeId.nodeId;
 
 @Component(immediate = true)
 public class AppComponent {
@@ -49,6 +56,7 @@ public class AppComponent {
         NodeId node1 = new NodeId("172.17.0.5");
         NodeId node2 = new NodeId("172.17.0.6");
         NodeId node3 = new NodeId("172.17.0.7");
+        int numberOfControllers = 3;
 
         // ArrayList to store Controller object
         ArrayList<Controller> controllers = new ArrayList<>();
@@ -60,6 +68,63 @@ public class AppComponent {
 
         // Getting all Switches(devices) of the Network
         Iterable<Device> devices = deviceService.getDevices();
+
+        // Initial Switch-Controller Assignment Data
+        ArrayList<DeviceId> node1Devices = new ArrayList<>();
+        ArrayList<DeviceId> node2Devices = new ArrayList<>();
+        ArrayList<DeviceId> node3Devices = new ArrayList<>();
+        // Node1 (172.17.0.5) Devices
+        node1Devices.add(DeviceId.deviceId("of:0000000000000014"));
+        node1Devices.add(DeviceId.deviceId("of:0000000000000013"));
+        node1Devices.add(DeviceId.deviceId("of:0000000000000011"));
+        node1Devices.add(DeviceId.deviceId("of:0000000000000012"));
+        node1Devices.add(DeviceId.deviceId("of:0000000000000016"));
+        node1Devices.add(DeviceId.deviceId("of:0000000000000017"));
+        node1Devices.add(DeviceId.deviceId("of:0000000000000015"));
+        node1Devices.add(DeviceId.deviceId("of:0000000000000018"));
+        // Node2 (172.17.0.6) Devices
+        node2Devices.add(DeviceId.deviceId("of:000000000000000f"));
+        node2Devices.add(DeviceId.deviceId("of:000000000000000c"));
+        node2Devices.add(DeviceId.deviceId("of:000000000000000b"));
+        node2Devices.add(DeviceId.deviceId("of:000000000000000d"));
+        node2Devices.add(DeviceId.deviceId("of:0000000000000010"));
+        node2Devices.add(DeviceId.deviceId("of:0000000000000009"));
+        node2Devices.add(DeviceId.deviceId("of:000000000000000a"));
+        // Node3 (172.17.0.7) Devices
+        node3Devices.add(DeviceId.deviceId("of:0000000000000002"));
+        node3Devices.add(DeviceId.deviceId("of:0000000000000008"));
+        node3Devices.add(DeviceId.deviceId("of:0000000000000005"));
+        node3Devices.add(DeviceId.deviceId("of:000000000000000e"));
+        node3Devices.add(DeviceId.deviceId("of:0000000000000003"));
+        node3Devices.add(DeviceId.deviceId("of:0000000000000004"));
+        node3Devices.add(DeviceId.deviceId("of:0000000000000007"));
+        node3Devices.add(DeviceId.deviceId("of:0000000000000006"));
+        node3Devices.add(DeviceId.deviceId("of:0000000000000019"));
+        node3Devices.add(DeviceId.deviceId("of:0000000000000001"));
+        for (DeviceId deviceId : node1Devices) {
+            controllers.get(0).addSwitch(deviceId, 0);
+            try {
+                mastershipStore.setMaster(node1, deviceId);
+            }catch (NullPointerException nullPointerException){
+                log.info("At switch assignment -> "+nullPointerException);
+            }
+        }
+        for (DeviceId deviceId : node2Devices) {
+            controllers.get(1).addSwitch(deviceId, 0);
+            try {
+                mastershipStore.setMaster(node2, deviceId);
+            }catch (NullPointerException nullPointerException){
+                log.info("At switch assignment -> "+nullPointerException);
+            }
+        }
+        for (DeviceId deviceId : node3Devices) {
+            controllers.get(2).addSwitch(deviceId, 0);
+            try {
+                mastershipStore.setMaster(node3, deviceId);
+            }catch (NullPointerException nullPointerException){
+                log.info("At switch assignment -> "+nullPointerException);
+            }
+        }
 
 
         // *******Starting Monitoring Module (within TimerTask)********
@@ -121,7 +186,7 @@ public class AppComponent {
                  * Dynamic LB Threshold
                  * On heavy load, the threshold will be 1.2 the avg. load //1.1 for testing
                  */
-                final long threshold = 16000;
+                final long threshold = 20000;
                 long loadBalancingThreshold;
                 /*
                 If average controller load is higher than threshold(under heavy load situation)
@@ -130,17 +195,17 @@ public class AppComponent {
                 Otherwise controller below x% (x<100) of average load will be selected to stop excessive and unnecessary Sw.Mig.
                  */
                 boolean dynamicLoadBalancingThreshold = false;
-                if(averageControllerLoad < threshold){
+                if (averageControllerLoad < threshold) {
                     loadBalancingThreshold = threshold;
-                }else{
-                    loadBalancingThreshold = (long)Math.round(averageControllerLoad*1.20);
+                } else {
+                    loadBalancingThreshold = (long) Math.round(averageControllerLoad * 1.20);
                     dynamicLoadBalancingThreshold = true;
                 }
 
                 //************ Overloaded controller detection *************
                 Controller overloadedController = null;
                 //For storing the previous load value(before mig.) for sending to CSV as Switch Migration value to plot graph to identify switch migration point
-                long overloadedControllerLoad=0;
+                long overloadedControllerLoad = 0;
                 //Sort Controller Arraylist wrt Controller Load(Reverse)
                 //ArrayList<Controller> sortedControllers = controllers;
                 Collections.sort(controllers, Comparator.comparing(Controller::getControllerLoad).reversed());
@@ -149,9 +214,9 @@ public class AppComponent {
                     overloadedControllerLoad = overloadedController.controllerLoad;
                 }
 
-				/*
-				************* Beginning Controller Selection Module **************
-				 */
+                /*
+                 ************* Beginning Controller Selection Module **************
+                 */
                 //For tracking Controller Selection Time
                 long startControllerSelectionTime = System.nanoTime();
 
@@ -167,11 +232,11 @@ public class AppComponent {
                     then no migrations to reduce unnecessary load balancing (for dynamic LB threshold only)
                      */
                     //For avoiding excessive and unnecessary sw. mig.
-                    if(dynamicLoadBalancingThreshold){
-                        if(controllers.get(0).controllerLoad < (long)Math.round(averageControllerLoad*0.80)){
+                    if (dynamicLoadBalancingThreshold) {
+                        if (controllers.get(0).controllerLoad < (long) Math.round(averageControllerLoad * 0.80)) {
                             selectedController = controllers.get(0);
                         }
-                    }else{
+                    } else {
                         selectedController = controllers.get(0);
                         //It's possible to set two threshold for dynamic and static LB threshold (using else-if for this block)
                     }
@@ -194,12 +259,12 @@ public class AppComponent {
                 if ((overloadedController != null) && (selectedController != null)) {
                     //Sort switch arraylist of overloaded controller object(descending)
                     //Collections.sort(overloadedController.switches, Comparator.comparing(Switch::getSwitchLoad).reversed());
-                    for (Switch sw: overloadedController.switches) {
+                    for (Switch sw : overloadedController.switches) {
                         sw.temp = averageControllerLoad - (selectedController.controllerLoad + sw.switchLoad);
                     }
                     Collections.sort(overloadedController.switches, Comparator.comparing(Switch::getSwitchTemp));
-                    for(Switch sw: overloadedController.switches){
-                        if(sw.temp > 0){
+                    for (Switch sw : overloadedController.switches) {
+                        if (sw.temp > 0) {
                             selectedSwitch = sw;
                             break;
                         }
@@ -243,7 +308,7 @@ public class AppComponent {
                 }
 
                 // CSV data add for sending
-                CSV = Math.round(Math.subtractExact(System.currentTimeMillis(), startTime)/1000) + "," + iteration +","+ averageControllerLoad + ",";
+                CSV = Math.round(Math.subtractExact(System.currentTimeMillis(), startTime) / 1000) + "," + iteration + "," + averageControllerLoad + ",";
                 for (Controller controller : controllers) {
                     CSV += controller.controllerLoad + ",";
                 }
@@ -264,6 +329,8 @@ public class AppComponent {
 
                  */
 
+                //*************************** Migration Module **************************
+                //with necessary calculation
 
                 boolean switchMigration = false;
                 if ((overloadedController != null) && (selectedController != null) && (selectedSwitch != null)) {
@@ -278,12 +345,12 @@ public class AppComponent {
                     selectedController.switches.add(selectedSwitch);
                     log.info("Switch Reassigned: " + selectedSwitch.deviceId.toString() + " -> " + selectedController.nodeId.toString());
                     switchMigration = true;
-                    numberOfMigrations ++;
+                    numberOfMigrations++;
                 }
                 // CSV data add for sending
-                if(switchMigration){
+                if (switchMigration) {
                     CSV += overloadedControllerLoad + ",";
-                }else{
+                } else {
                     CSV += "-9999,";
                 }
                 for (Controller controller : controllers) {
