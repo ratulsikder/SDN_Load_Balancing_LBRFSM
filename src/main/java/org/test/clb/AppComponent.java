@@ -430,17 +430,34 @@ public class AppComponent {
                         allSwitches.addAll(controller.switches);
                     }
 
+                    boolean switchReassignment = false;
                     for (Controller controller : controllers) {
                         if (controller.controllerLoad < averageControllerLoad) {
                             ArrayList<Switch> homeSwitches = new ArrayList<>();
+                            // Adding home switch object to home switch from device id
                             for (DeviceId deviceId : controller.homeSwitches) {
                                 for (Switch aSwitch : allSwitches) {
-                                    if(deviceId == aSwitch.deviceId){
+                                    if (deviceId.equals(aSwitch.deviceId)) {
                                         homeSwitches.add(aSwitch);
                                     }
                                 }
                             }
-                            
+                            //Sort home switches from low to high load
+                            Collections.sort(homeSwitches, Comparator.comparing(Switch::getSwitchLoad));
+
+                            for (Switch aSwitch : homeSwitches) {
+                                // Checking whether a home switch is in the mother controller or not and then reassign if all conditions met
+                                if (!mastershipStore.getMaster(aSwitch.deviceId).equals(controller.nodeId)) {
+                                    mastershipStore.setMaster(controller.nodeId, aSwitch.deviceId);
+                                    switchReassignment = true;
+                                    log.info("Switch Reassigned to Home Controller");
+                                    break;
+                                }
+                            }
+
+                        }
+                        if(switchReassignment){
+                            break;
                         }
                     }
 
