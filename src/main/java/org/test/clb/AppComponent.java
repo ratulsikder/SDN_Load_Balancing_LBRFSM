@@ -448,15 +448,18 @@ public class AppComponent {
                             for (Switch aSwitch : homeSwitches) {
                                 // Checking whether a home switch is in the mother controller or not and then reassign if all conditions met
                                 if (!mastershipStore.getMaster(aSwitch.deviceId).equals(controller.nodeId)) {
-                                    mastershipStore.setMaster(controller.nodeId, aSwitch.deviceId);
-                                    switchReassignment = true;
-                                    log.info("Switch Reassigned to Home Controller");
-                                    break;
+                                    // If the immigrant switch load does not exceed the parent load above average load then immigration will take place
+                                    if (controller.controllerLoad + aSwitch.switchLoad < averageControllerLoad) {
+                                        mastershipStore.setMaster(controller.nodeId, aSwitch.deviceId);
+                                        switchReassignment = true;
+                                        log.info("Switch Reassigned to Home Controller");
+                                        break;
+                                    }
                                 }
                             }
 
                         }
-                        if(switchReassignment){
+                        if (switchReassignment) {
                             break;
                         }
                     }
