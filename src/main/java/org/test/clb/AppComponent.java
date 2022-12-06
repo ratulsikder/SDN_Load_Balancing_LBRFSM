@@ -49,7 +49,7 @@ public class AppComponent {
         final long startTime = System.currentTimeMillis();
 
         //Java socket for sending data
-        Client client = new Client("192.168.1.100", 5000);
+        Client client = new Client("192.168.0.100", 5000);
 
 
         // Controller node(IP) Declaration
@@ -266,7 +266,7 @@ public class AppComponent {
                     for (Switch sw : overloadedController.switches) {
                         sw.temp = averageControllerLoad - (selectedController.controllerLoad + sw.switchLoad);
                     }
-                    Collections.sort(overloadedController.switches, Comparator.comparing(Switch::getSwitchTemp));
+                    Collections.sort(overloadedController.switches, Comparator.comparing(Switch::getSwitchLoad).reversed());
                     for (Switch sw : overloadedController.switches) {
                         if (sw.temp > 0) {
                             selectedSwitch = sw;
