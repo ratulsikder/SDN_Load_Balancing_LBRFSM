@@ -360,8 +360,14 @@ public class AppComponent {
                 for (Controller controller : controllers) {
                     CSV += controller.controllerLoad + ",";
                 }
-                CSV += controllerSelectionTime + ",";
-                CSV += switchSelectionTime + ",";
+                if (selectedController != null) {
+                    CSV += controllerSelectionTime + ",";
+                } else
+                    CSV += ",";
+                if (selectedSwitch != null) {
+                    CSV += switchSelectionTime + ",";
+                } else
+                    CSV += ",";
                 CSV += numberOfMigrations + ",";
                 CSV += loadBalancingThreshold + ",";
                 //Trimming the last comma of CSV
