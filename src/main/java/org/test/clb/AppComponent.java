@@ -66,6 +66,7 @@ public class AppComponent {
         controllers.add(new Controller(node2));
         controllers.add(new Controller(node3));
 
+        //STARTING INITIAL SWITCH CONTROLLER ASSIGNMENT
         // Initial Switch-Controller Assignment Data
         ArrayList<DeviceId> node1Devices = new ArrayList<>();
         ArrayList<DeviceId> node2Devices = new ArrayList<>();
@@ -126,6 +127,8 @@ public class AppComponent {
         controllers.get(0).homeSwitches = node1Devices;
         controllers.get(1).homeSwitches = node2Devices;
         controllers.get(2).homeSwitches = node3Devices;
+
+        //END INITIAL SWITCH CONTROLLER ASSIGNMENT SECTION
 
         // Getting all Switches(devices) of the Network
         Iterable<Device> devices = deviceService.getDevices();
@@ -427,6 +430,8 @@ public class AppComponent {
 
 				 */
 
+                //TURNED OFF RESTORATION MODULE FOR HEAD TO HEAD COMPARISON
+                /*
                 // ******************** Restoration Module *********************
                 if (switchMigration == false) {
                     // Sorting controllers from min load to max
@@ -471,7 +476,8 @@ public class AppComponent {
                     }
 
                 }
-
+                //******************** END RESTORATION MODULE **********************
+*/
             }
 
 
