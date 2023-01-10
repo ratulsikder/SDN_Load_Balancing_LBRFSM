@@ -1,16 +1,6 @@
 package org.test.clb;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.*;
-
-import org.apache.felix.scr.annotations.Activate;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Deactivate;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.ReferenceCardinality;
+import org.apache.felix.scr.annotations.*;
 import org.onosproject.cluster.NodeId;
 import org.onosproject.mastership.MastershipStore;
 import org.onosproject.net.Device;
@@ -21,7 +11,7 @@ import org.onosproject.net.device.PortStatistics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.onosproject.cluster.NodeId.nodeId;
+import java.util.*;
 
 @Component(immediate = true)
 public class AppComponent {
@@ -205,13 +195,14 @@ public class AppComponent {
                 if (averageControllerLoad < threshold) {
                     loadBalancingThreshold = threshold;
                 } else {
-                    loadBalancingThreshold = (long) Math.round(averageControllerLoad * 1.20);
+                    // For our algorithm, the factor is 1.30; in CAMD and ISMDA it is 1.15
+                    loadBalancingThreshold = (long) Math.round(averageControllerLoad * 1.30);
                     dynamicLoadBalancingThreshold = true;
                 }
 
                 //************ Overloaded controller detection *************
                 Controller overloadedController = null;
-                //For storing the previous load value(before mig.) for sending to CSV as Switch Migration value to plot graph to identify switch migration point
+                //Storing the previous load value(before mig.) for sending to CSV as Switch Migration value to plot in graph to identify switch migration point
                 long overloadedControllerLoad = 0;
                 //Sort Controller Arraylist wrt Controller Load(Reverse)
                 //ArrayList<Controller> sortedControllers = controllers;
@@ -219,6 +210,11 @@ public class AppComponent {
                 if (controllers.get(0).controllerLoad > loadBalancingThreshold) {
                     overloadedController = controllers.get(0);
                     overloadedControllerLoad = overloadedController.controllerLoad;
+                }
+                try {
+                    log.info("Overloaded controller: " + overloadedController.getNodeId());
+                }catch (NullPointerException nullPointerException){
+                    log.info("No overload");
                 }
 
                 /*
@@ -239,8 +235,9 @@ public class AppComponent {
                     then no migrations to reduce unnecessary load balancing (for dynamic LB threshold only)
                      */
                     //For avoiding excessive and unnecessary sw. mig.
+                    // Now setting from 80% of avg ctl load to 100%
                     if (dynamicLoadBalancingThreshold) {
-                        if (controllers.get(0).controllerLoad < (long) Math.round(averageControllerLoad * 0.80)) {
+                        if (controllers.get(0).controllerLoad < (long) Math.round(averageControllerLoad)) {
                             selectedController = controllers.get(0);
                         }
                     } else {
@@ -255,6 +252,12 @@ public class AppComponent {
                 //Re-sort controller objects wrt ip order(node address)
                 Collections.sort(controllers, Comparator.comparing(Controller::getNodeId));
 
+                try {
+                    log.info("Selected controller: " + selectedController.getNodeId());
+                }catch (NullPointerException nullPointerException){
+                    // Print nothing
+                }
+
 				/*
 				************************* Beginning Switch Selection Module **********************
 				
@@ -267,8 +270,9 @@ public class AppComponent {
                     //Sort switch arraylist of overloaded controller object(descending)
                     //Collections.sort(overloadedController.switches, Comparator.comparing(Switch::getSwitchLoad).reversed());
                     for (Switch sw : overloadedController.switches) {
-                        sw.temp = averageControllerLoad - (selectedController.controllerLoad + sw.switchLoad);
+                        sw.temp = loadBalancingThreshold - (selectedController.controllerLoad + sw.switchLoad);
                     }
+                    // Our algorithm selects the high loaded switch; sorting descending order
                     Collections.sort(overloadedController.switches, Comparator.comparing(Switch::getSwitchLoad).reversed());
                     for (Switch sw : overloadedController.switches) {
                         if (sw.temp > 0) {
@@ -279,6 +283,12 @@ public class AppComponent {
                 }
 
                 long switchSelectionTime = System.nanoTime() - startSwitchSelectionTime;
+
+                try {
+                    log.info("Selected switch: " + selectedSwitch.getDeviceId().toString());
+                }catch (NullPointerException nullPointerException){
+                    // Print nothing
+                }
 
 
                 //Print the overloaded and selected controller and selected switch
@@ -315,12 +325,12 @@ public class AppComponent {
                 }
 
                 // CSV data add for sending
-                CSV = Math.round(Math.subtractExact(System.currentTimeMillis(), startTime) / 1000) + "," + iteration + "," + averageControllerLoad + ",";
+                CSV = Math.round(Math.subtractExact(System.currentTimeMillis(), startTime) / 1000) + "," + iteration + "," + averageControllerLoad * 0.0000076294 + ",";
                 for (Controller controller : controllers) {
-                    CSV += controller.controllerLoad + ",";
+                    CSV += controller.controllerLoad * 0.0000076294 + ",";
                 }
                 //CSV Header
-                CSVHeader = "Time(s),Iteration,Avg .Cont. Load,Controller 1 Load,Controller 2 Load,Controller 3 Load,";
+                CSVHeader = "Time(s),Iteration,Avg. Cont. Load,Controller 1 Load,Controller 2 Load,Controller 3 Load,";
 
 				/*
 				Starting Migration Module
@@ -356,12 +366,12 @@ public class AppComponent {
                 }
                 // CSV data add for sending
                 if (switchMigration) {
-                    CSV += overloadedControllerLoad + ",";
+                    CSV += overloadedControllerLoad * 0.0000076294 + ",";
                 } else {
                     CSV += "-9999,";
                 }
                 for (Controller controller : controllers) {
-                    CSV += controller.controllerLoad + ",";
+                    CSV += controller.controllerLoad * 0.0000076294 + ",";
                 }
                 if (selectedController != null) {
                     CSV += controllerSelectionTime + ",";
@@ -372,7 +382,7 @@ public class AppComponent {
                 } else
                     CSV += ",";
                 CSV += numberOfMigrations + ",";
-                CSV += loadBalancingThreshold + ",";
+                CSV += loadBalancingThreshold * 0.0000076294 + ",";
                 //Trimming the last comma of CSV
                 CSV = CSV.substring(0, CSV.length() - 1);
                 //CSV Header
