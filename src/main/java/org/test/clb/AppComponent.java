@@ -299,14 +299,6 @@ public class AppComponent {
                     log.info("No overloaded controllers.");
                 }
 
-				/*
-				//Test print
-				for(Controller controller: controllers){
-					log.info("* " + controller.nodeId + " Load: " + controller.controllerLoad + " Switch: " + controller.switches.size());
-				}
-
-				 */
-
                 // For testing...
                 // Retrieving info of each controller and display in ONOS log
                 for (Controller controller : controllers) {
@@ -334,17 +326,7 @@ public class AppComponent {
 
 				/*
 				Starting Migration Module
-				Future: Migration failure will be tracked and avoided by controller selection and switch selection module
 				 */
-                //For storing the previous load value(before mig.) for sending to CSV as Switch Migration value to plot graph to identify switch migration point
-                /*long selectedControllerLoad=0;
-                try{
-                    selectedControllerLoad = selectedController.controllerLoad;
-                }catch (NullPointerException nullPointerException){
-                    log.info(nullPointerException.toString());
-                }
-
-                 */
 
                 //*************************** Migration Module **************************
                 //with necessary calculation
@@ -364,7 +346,7 @@ public class AppComponent {
                     switchMigration = true;
                     numberOfMigrations++;
                 }
-                // CSV data add for sending
+                // CSV data add for sending to logging java program
                 if (switchMigration) {
                     CSV += overloadedControllerLoad * 0.0000076294 + ",";
                 } else {
@@ -414,34 +396,7 @@ public class AppComponent {
                 iteration++;
 
 
-				/*
-				for(Controller controller: controllers){
-					log.info("# " + controller.nodeId + " Load: " + controller.controllerLoad + " Switch: " + controller.switches.size());
-				}
 
-				 */
-
-
-                //Checking Controller Overload
-
-
-                // Testing switch reassignment...
-				/*
-				boolean test = true;
-				for (Controller controller : controllers) {
-					ArrayList<Switch> switches = controller.getSwitches();
-					if ((switches.size() > 2) && (test) && (controller.nodeId != node3)) {
-						// run once per schedule
-						mastershipStore.setMaster(node3, switches.get(0).deviceId);
-						log.info("# Switch reassigned.");
-						test = false;
-					}
-				}
-
-				 */
-
-                //TURNED OFF RESTORATION MODULE FOR HEAD TO HEAD COMPARISON
-                /*
                 // ******************** Restoration Module *********************
                 if (switchMigration == false) {
                     // Sorting controllers from min load to max
@@ -487,7 +442,6 @@ public class AppComponent {
 
                 }
                 //******************** END RESTORATION MODULE **********************
-*/
             }
 
 
